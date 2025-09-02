@@ -1,0 +1,43 @@
+{
+  "collectionName": "components_home_links",
+  "info": {
+    "displayName": "link",
+    "icon": "bulletList"
+  },
+  "options": {},
+  "attributes": {
+    "LinkTitle": {
+      "type": "string"
+    },
+    "googleDrive": {
+      "type": "boolean"
+    },
+    "linkUrl": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "googleDrive"
+            },
+            false
+          ]
+        }
+      }
+    },
+    "googleDriveID": {
+      "type": "string",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "googleDrive"
+            },
+            true
+          ]
+        }
+      }
+    }
+  },
+  "config": {}
+}
