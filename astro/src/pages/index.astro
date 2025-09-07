@@ -5,6 +5,8 @@ import Logo from "../components/logo.astro";
 import type { HomePageResponse } from "../interfaces/HomePage";
 
 import fetchApi from "../lib/strapi";
+import { optimizeStrapiImage } from "../lib/imageOptimizer";
+
 const response = await fetchApi<HomePageResponse>({
 	endpoint: "home-page",
 	query: {
@@ -17,6 +19,9 @@ const logo = data?.logo;
 const heroText = data?.heroText;
 const linksCollection = data?.linkCollection;
 const heroImage = data?.heroImage;
+
+// Optimize the hero image during build
+const optimizedHeroImage = heroImage ? await optimizeStrapiImage(heroImage, 'medium') : null;
 ---
 
 <style>
@@ -161,7 +166,7 @@ const heroImage = data?.heroImage;
 			})}
 		</div>
 		<div class="hero-image">
-			<img src={import.meta.env.STRAPI_URL + heroImage.formats.medium.url} alt={heroImage.alternativeText} />
+			{optimizedHeroImage && <img src={optimizedHeroImage.src} alt={optimizedHeroImage.alt} />}
 		</div>
 	</div>
 </SiteLayout>

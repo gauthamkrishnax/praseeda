@@ -5,6 +5,8 @@ import type { AboutPageResponse } from "../interfaces/AboutPage";
 import fetchApi from "../lib/strapi";
 import RichText from "../components/RichText.astro";
 import BackButton from "../components/BackButton.astro";
+import { optimizeStrapiImage } from "../lib/imageOptimizer";
+
 const response = await fetchApi<AboutPageResponse>({
 	endpoint: "about-page",
 	query: {
@@ -15,6 +17,9 @@ const response = await fetchApi<AboutPageResponse>({
 const data = response?.data;
 const aboutText = data?.aboutText;
 const portfolioImage = data?.portfolioImage;
+
+// Optimize the portfolio image during build
+const optimizedPortfolioImage = portfolioImage ? await optimizeStrapiImage(portfolioImage, 'medium') : null;
 ---
 <style>
     body {
@@ -46,7 +51,7 @@ const portfolioImage = data?.portfolioImage;
             <RichText content={aboutText} />
         </div>
         <div class="about-image">
-            <img src={import.meta.env.STRAPI_URL + portfolioImage.url} alt={portfolioImage.alternativeText} />
+            {optimizedPortfolioImage && <img src={optimizedPortfolioImage.src} alt={optimizedPortfolioImage.alt} />}
         </div>
     </div>
 </SiteLayout>
