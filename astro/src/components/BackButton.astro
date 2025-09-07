@@ -1,0 +1,80 @@
+---
+export interface Props {
+  href?: string;
+  onClick?: () => void;
+  class?: string;
+}
+
+const { href, onClick, class: className = "" } = Astro.props;
+
+// Default to browser history back if no href or onClick provided
+const defaultOnClick = () => window.history.back();
+const finalOnClick = onClick || (!href ? defaultOnClick : undefined);
+const finalHref = href || "#";
+---
+
+<a 
+  href={finalHref}
+  class={`back-button ${className}`}
+  onclick={finalOnClick ? `(${finalOnClick.toString()})()` : undefined}
+>
+  <svg 
+    class="back-arrow" 
+    width="16" 
+    height="16" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path 
+      d="M15 18L9 12L15 6" 
+      stroke="currentColor" 
+      stroke-width="2" 
+      stroke-linecap="round" 
+      stroke-linejoin="round"
+    />
+  </svg>
+  <span class="back-text">BACK</span>
+</a>
+
+<style>
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background-color: #6B4E3B;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .back-button:hover {
+    background-color: #5A4030;
+  }
+
+  .back-button:active {
+    background-color: #4A3428;
+  }
+
+  .back-arrow {
+    width: 16px;
+    height: 16px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .back-text {
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+</style>

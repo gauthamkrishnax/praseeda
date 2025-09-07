@@ -1,0 +1,11 @@
+---
+import RichText from "./RichText.astro";
+
+const { logoData } = Astro.props;
+---
+
+<div class="logo">
+    <span>
+        <RichText content={logoData} />
+    </span>
+</div>

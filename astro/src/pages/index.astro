@@ -1,27 +1,167 @@
 ---
-import fetchApi from "../lib/strapi";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import RichText from "../components/RichText.astro";
+import Logo from "../components/logo.astro";
+import type { HomePageResponse } from "../interfaces/HomePage";
 
-const articles = await fetchApi({
-    endpoint: "home-page",
-    query: {
-        populate: "*",
-    },
+import fetchApi from "../lib/strapi";
+const response = await fetchApi<HomePageResponse>({
+	endpoint: "home-page",
+	query: {
+		populate: "*",
+	},
 });
+
+const data = response?.data;
+const logo = data?.logo;
+const heroText = data?.heroText;
+const linksCollection = data?.linkCollection;
+const heroImage = data?.heroImage;
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-		<div>
-			<h2>Articles Data:</h2>
-			<pre>{JSON.stringify(articles, null, 2)}</pre>
+<style>
+	.container {
+		position: relative;
+		background-color: var(--primary-color);
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: 70% 30%;
+		grid-template-rows: 45% 55%;
+		gap: 0px 0px;
+		grid-template-areas:
+			"hero-text hero-image"
+			"links-collection hero-image";
+	}
+	.hero-image {
+		grid-area: hero-image;
+	}
+	.hero-text {
+		grid-area: hero-text;
+	}
+	.links-collection {
+		grid-area: links-collection;
+	}
+	.logo {
+		/* grid-area: hero-text; */
+		position: absolute;
+		padding: 20px 30px;
+	}
+	.hero-text {
+		font-family: "Baskervville", serif;
+		margin-top: 60px;
+		padding: 20px 30px;
+		line-height: 1;
+		h1 {
+			font-size: 40px;
+			font-weight: 400;
+		}
+	}
+	.links-collection {
+		background-color: var(--secondary-color);
+		padding: 20px 30px;
+		display: flex;
+		justify-content: center;	
+		flex-direction: column;
+		gap: 30px;
+		a {
+			color: var(--text-secondary);
+			text-decoration: none;
+			font-size: 22px;
+			line-height: 1;
+			font-weight: 400;
+		}
+
+		a:hover {
+			color: var(--text-primary);
+			text-decoration: underline;
+			transition: all 0.3s ease;
+			opacity: 0.8;
+			path {
+				fill: var(--text-primary);
+				transition: all 0.3s ease;
+			}
+		}
+
+		svg {
+			margin-left: 10px;
+			margin-bottom: -2px;
+		}
+	}
+	.hero-image {
+		overflow: hidden;
+		height: 100vh;
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+	}
+
+	@media (max-width: 900px) {
+		.container {
+			display: grid;
+			grid-template-columns: 100%;
+			grid-template-rows: 40% 60%;
+			grid-template-areas:
+			"links-collection"
+			"hero-image";
+		}
+
+		.hero-image {
+			height: 100%;
+			img {
+				width: 100%;
+				object-fit: cover;
+				object-position: top;
+			}
+		}
+
+		.hero-text {
+			position: absolute;
+			bottom: 0;
+			background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
+			color: var(--text-secondary);
+
+		}
+
+		.links-collection {
+			padding: 40px 30px;
+			gap: 40px;
+			a{
+				color: var(--text-primary);
+				path {
+					fill: var(--text-primary);
+				}
+			}
+			background-color: var(--primary-color);
+		}
+</style>
+
+<SiteLayout title="Home Page" backgroundColor="var(--primary-color)">
+	<div class="container">
+		<div class="logo">
+			<Logo logoData={logo} />
 		</div>
-	</body>
-</html>
+		<div class="hero-text">
+			<RichText content={heroText} />
+		</div>
+		<div class="links-collection">
+			{linksCollection.map((link)=>{
+				return (
+					<div class="link-item">
+						<a href={link.linkUrl || link.googleDriveID}>
+							{link.LinkTitle}
+							<svg width="25" height="19" viewBox="0 0 25 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.8217 0.821656C14.1342 0.509205 14.5581 0.333679 15 0.333679C15.4419 0.333679 15.8658 0.509205 16.1783 0.821656L23.6783 8.32166C23.9908 8.6342 24.1663 9.05805 24.1663 9.49999C24.1663 9.94193 23.9908 10.3658 23.6783 10.6783L16.1783 18.1783C15.864 18.4819 15.443 18.6499 15.006 18.6461C14.569 18.6423 14.151 18.467 13.842 18.158C13.533 17.849 13.3577 17.431 13.3539 16.994C13.3501 16.557 13.5181 16.136 13.8217 15.8217L18.3333 11.1667H2.50001C2.05798 11.1667 1.63406 10.9911 1.3215 10.6785C1.00894 10.3659 0.833344 9.94202 0.833344 9.49999C0.833344 9.05796 1.00894 8.63404 1.3215 8.32148C1.63406 8.00892 2.05798 7.83332 2.50001 7.83332H18.3333L13.8217 3.17832C13.5092 2.86578 13.3337 2.44193 13.3337 1.99999C13.3337 1.55805 13.5092 1.1342 13.8217 0.821656Z" fill="white"/>
+</svg>
+
+						</a>
+					</div>
+				)
+			})}
+		</div>
+		<div class="hero-image">
+			<img src={import.meta.env.STRAPI_URL + heroImage.formats.medium.url} alt={heroImage.alternativeText} />
+		</div>
+	</div>
+</SiteLayout>

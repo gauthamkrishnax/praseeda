@@ -1,0 +1,51 @@
+---
+interface Node {
+  type: string;
+  text?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  url?: string;
+  children?: Node[];
+  level?: number;
+}
+
+// Recursively render nodes
+function renderNode(node: Node): string {
+  switch (node.type) {
+    case "text": {
+      let el: string = node.text || "";
+
+      if (node.bold) el = `<strong>${el}</strong>`;
+      if (node.italic) el = `<em>${el}</em>`;
+      if (node.underline) el = `<u>${el}</u>`;
+
+      return el;
+    }
+
+    case "paragraph":
+      return `<p>${node.children?.map(renderNode).join('')}</p>`;
+
+    case "heading": {
+      const level = node.level || 1;
+      return `<h${level}>${node.children?.map(renderNode).join('')}</h${level}>`;
+    }
+
+    case "link":
+      return `<a href="${node.url}" target="_blank" rel="noopener noreferrer">${node.children?.map(renderNode).join('')}</a>`;
+
+    case "list":
+      return `<ul>${node.children?.map(renderNode).join('')}</ul>`;
+
+    case "list-item":
+      return `<li>${node.children?.map(renderNode).join('')}</li>`;
+
+    default:
+      return node.children?.map(renderNode).join('') || '';
+  }
+}
+
+const { content } = Astro.props as { content: Node[] };
+---
+
+<div class="richtext" set:html={content.map(renderNode).join('')}></div>

@@ -31,6 +31,9 @@ export default async function fetchApi<T>({
       });
     }
     const res = await fetch(url.toString());
+    if (!res.ok) {
+      throw new Error(`Failed to fetch ${url.toString()}`);
+    }
     let data = await res.json();
   
     if (wrappedByKey) {

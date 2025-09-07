@@ -1,0 +1,52 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import type { AboutPageResponse } from "../interfaces/AboutPage";
+
+import fetchApi from "../lib/strapi";
+import RichText from "../components/RichText.astro";
+import BackButton from "../components/BackButton.astro";
+const response = await fetchApi<AboutPageResponse>({
+	endpoint: "about-page",
+	query: {
+		populate: "*",
+	},
+});
+
+const data = response?.data;
+const aboutText = data?.aboutText;
+const portfolioImage = data?.portfolioImage;
+---
+<style>
+    body {
+        padding: 3em;
+        width: 100%;
+    }
+
+    .container {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 3em;
+    }
+
+    .about-text {
+        padding: 3em;
+        max-width: 800px;
+        background-color: var(--primary-color);
+        padding-bottom: 5em;
+    }
+</style>
+
+<SiteLayout title="About Page" backgroundColor="var(--secondary-color)">
+    <BackButton />
+    <div class="container">
+        <div class="about-text">
+            <RichText content={aboutText} />
+        </div>
+        <div class="about-image">
+            <img src={import.meta.env.STRAPI_URL + portfolioImage.url} alt={portfolioImage.alternativeText} />
+        </div>
+    </div>
+</SiteLayout>
